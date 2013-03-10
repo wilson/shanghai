@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+libdir = File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
+require 'shanghai'
+
+commands = %w[start stop status]
+require 'optparse'
+options = {}
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: shanghai (#{commands.join('|')})"
+
+  opts.on('-a', '--address [address]', 'Bind to and listen on the specific interface') do |addr|
+    options['address'] = addr.to_s
+  end
+
+  opts.on('-p', '--port [port]', 'Bind to and listen on the specified port') do |port|
+    options['port'] = port.to_i
+  end
+
+  opts.on('--pidfile [pidfile]', 'Store process id in the specified location') do |pidfile|
+    options['pidfile'] = pidfile
+  end
+
+  opts.on('--logfile [logfile]', 'Log to the specified log file') do |logfile|
+    options['logfile'] = logfile
+  end
+
+  opts.on('-d', '--daemonize', 'Run as a daemon') do |_|
+    options['daemonize'] = true
+  end
+
+  opts.on('--version', 'Display the version info and exit') do |_|
+    $stdout.puts ::Shanghai.version
+    exit 0
+  end
+end
+
+begin
+  parser.parse!
+rescue => ex
+  $stderr.puts parser
+  abort ex.message
+end
+
+if ARGV.length == 0
+  abort "No supported command was specified\n#{parser}"
+elsif ARGV.length > 1
+  abort "Unsupported options\n#{parser}"
+elsif commands.include?(ARGV.first)
+  ::Shanghai.process_command(ARGV.first, options)
+else
+  abort "Command must be one of the following: #{commands.join(', ')}\n#{parser}"
+end
+
+# vim: set filetype=ruby

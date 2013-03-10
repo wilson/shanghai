@@ -20,7 +20,7 @@ your perferred hardening scripts, and then tell you it is ready.
 This allows you to 'provision' any machine, without caring if it is virtual or 
 real.
 
-## Requirements
+## Platform Requirements
 
 * redis
 * rubinius, jruby, or ruby 1.9+
